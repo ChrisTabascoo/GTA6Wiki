@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GTA6Wiki – Wiki, Guides, Forum & Datenbank</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #0d0f14;
+    --bg2: #13161e;
+    --bg3: #1a1e2a;
+    --border: #252938;
+    --accent: #f7c948;
+    --accent2: #e05c2a;
+    --text: #e8eaf0;
+    --muted: #8a8fa8;
+    --tag-bg: #1e2235;
+    --card-hover: #1e2235;
+    --green: #3ecf8e;
+    --blue: #3b82f6;
+    --red: #ef4444;
+    --purple: #a855f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; line-height: 1.6; }
+
+  /* ── COOKIE-BANNER ── */
+  #cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999; background: #1a1e2a; border-top: 2px solid var(--accent); padding: 14px 24px; display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
+  #cookie-banner.hidden { display: none; }
+  .cb-text { flex: 1; min-width: 220px; font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .cb-text strong { color: var(--text); }
+  .cb-text a { color: var(--accent); text-decoration: underline; cursor: pointer; }
+  .cb-actions { display: flex; gap: 8px; align-items: center; }
+  .cb-btn { padding: 7px 16px; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; border: none; }
+  .cb-accept { background: var(--accent); color: #000; }
+  .cb-reject { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .cb-reject:hover { background: var(--bg3); color: var(--text); }
+
+  /* ── MODAL ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,.75); align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; max-width: 560px; width: 90%; max-height: 82vh; overflow-y: auto; padding: 28px; }
+  .modal-box h2 { font-size: 17px; font-weight: 800; margin-bottom: 14px; color: var(--accent); }
+  .modal-box h3 { font-size: 13px; font-weight: 700; margin: 14px 0 5px; }
+  .modal-box p { font-size: 12px; color: var(--muted); line-height: 1.7; margin-bottom: 6px; }
+  .modal-close { float: right; background: var(--bg3); border: 1px solid var(--border); color: var(--muted); border-radius: 6px; padding: 4px 12px; cursor: pointer; font-size: 12px; }
+
+  /* ── TOPBAR ── */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 52px; background: var(--bg2); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+  .topbar-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 16px; color: var(--text); text-decoration: none; cursor: pointer; }
+  .topbar-brand .ql-logo { width: 30px; height: 30px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #000; font-weight: 900; }
+  .topbar-brand .brand-sub { color: var(--accent); }
+  .topbar-right { display: flex; gap: 8px; align-items: center; }
+  .topbar-right .user-pill { background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 5px 14px; font-size: 12px; color: var(--muted); cursor: pointer; }
+  .topbar-right .user-pill:hover { color: var(--text); }
+
+  /* ── TABS ── */
+  .tabs-bar { background: var(--bg2); border-bottom: 1px solid var(--border); position: sticky; top: 52px; z-index: 90; }
+  .tabs-inner { max-width: 1140px; margin: 0 auto; display: flex; overflow-x: auto; padding: 0 24px; }
+  .tab-btn { padding: 13px 18px; font-size: 13px; font-weight: 500; color: var(--muted); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; transition: all .15s; }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+  .badge-new { background: var(--accent2); color: #fff; font-size: 9px; padding: 1px 5px; border-radius: 4px; margin-left: 4px; vertical-align: middle; font-weight: 700; }
+  .badge-count { background: var(--bg3); color: var(--muted); font-size: 10px; padding: 1px 6px; border-radius: 10px; margin-left: 4px; vertical-align: middle; }
+
+  /* ── HERO ── */
+  .hero { background: linear-gradient(180deg,#0a0c10 0%,rgba(13,15,20,0) 100%), linear-gradient(135deg,#0d1520 0%,#1a0d05 50%,#0d0f14 100%); border-bottom: 1px solid var(--border); padding: 40px 24px 30px; position: relative; overflow: hidden; }
+  .hero::before { content: 'GTA VI'; position: absolute; right: -20px; top: -20px; font-size: 160px; font-weight: 900; color: rgba(247,201,72,.03); letter-spacing: -10px; user-select: none; }
+  .hero-inner { max-width: 1140px; margin: 0 auto; display: flex; align-items: flex-start; gap: 28px; flex-wrap: wrap; }
+  .hero-cover { width: 90px; height: 118px; border-radius: 10px; flex-shrink: 0; background: linear-gradient(135deg,#1a0d05,#2d1a00); border: 2px solid var(--accent2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; position: relative; overflow: hidden; }
+  .hero-cover::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(255,255,255,.02) 10px,rgba(255,255,255,.02) 11px); }
+  .hero-cover .cover-vi { font-size: 32px; font-weight: 900; color: var(--accent); letter-spacing: -2px; line-height: 1; }
+  .hero-cover .cover-sub { font-size: 9px; color: var(--accent2); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .hero-info { flex: 1; min-width: 260px; }
+  .hero-breadcrumb { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+  .hero-title { font-size: 27px; font-weight: 900; letter-spacing: -.5px; margin-bottom: 6px; }
+  .hero-title span { color: var(--accent); }
+  .hero-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .hero-tag { background: var(--tag-bg); border: 1px solid var(--border); border-radius: 6px; padding: 3px 10px; font-size: 12px; color: var(--muted); }
+  .hero-tag strong { color: var(--text); }
+  .hero-desc { color: var(--muted); font-size: 13px; max-width: 560px; line-height: 1.7; margin-bottom: 14px; }
+  .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .btn { padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all .15s; }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:hover { background: #f5d464; }
+  .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .btn-outline:hover { background: var(--bg3); }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+  .release-pill { background: linear-gradient(90deg,#1a1000,#2d1e00); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 18px; display: flex; flex-direction: column; align-items: center; }
+  .release-pill .rp-label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .release-pill .rp-date { font-size: 15px; font-weight: 800; color: var(--accent); }
+  .release-pill .rp-platform { font-size: 11px; color: var(--muted); }
+
+  .page-view { display: none; }
+  .page-view.active { display: block; }
+
+  .main { max-width: 1140px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 1fr 290px; gap: 24px; }
+  @media (max-width: 820px) { .main { grid-template-columns: 1fr; } }
+  .main-full { max-width: 1140px; margin: 0 auto; padding: 24px; }
+
+  .section { margin-bottom: 26px; }
+  .section-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .section-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  .nav-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media (max-width: 600px) { .nav-cards { grid-template-columns: repeat(2,1fr); } }
+  .nav-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 6px; cursor: pointer; transition: all .15s; text-decoration: none; color: var(--text); }
+  .nav-card:hover { background: var(--card-hover); border-color: var(--accent); transform: translateY(-1px); }
+  .nav-card .nc-icon { font-size: 20px; width: 38px; height: 38px; background: var(--bg3); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .nav-card .nc-title { font-weight: 700; font-size: 13px; }
+  .nav-card .nc-count { font-size: 11px; color: var(--muted); }
+  .nc-orange { border-top: 2px solid var(--accent2); }
+  .nc-yellow { border-top: 2px solid var(--accent); }
+  .nc-blue { border-top: 2px solid var(--blue); }
+  .nc-green { border-top: 2px solid var(--green); }
+  .nc-red { border-top: 2px solid var(--red); }
+  .nc-purple { border-top: 2px solid var(--purple); }
+
+  .sidebar { display: flex; flex-direction: column; gap: 16px; }
+  .sidebar-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .sidebar-card-header { background: var(--bg3); padding: 11px 16px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); border-bottom: 1px solid var(--border); }
+  .sidebar-card-body { padding: 14px 16px; }
+  .meta-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .meta-row:last-child { border-bottom: none; }
+  .meta-row .mr-key { color: var(--muted); }
+  .meta-row .mr-val { font-weight: 600; color: var(--text); text-align: right; }
+  .mr-green { color: var(--green) !important; }
+  .mr-yellow { color: var(--accent) !important; }
+  .countdown-box { background: linear-gradient(135deg,#1a1000,#200a00); border: 1px solid var(--accent); border-radius: 10px; padding: 14px; text-align: center; }
+  .cd-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .cd-grid { display: flex; justify-content: center; gap: 8px; }
+  .cd-unit { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .cd-num { font-size: 22px; font-weight: 900; color: var(--accent); line-height: 1; min-width: 36px; text-align: center; }
+  .cd-sep { font-size: 22px; font-weight: 900; color: var(--accent); }
+  .cd-lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; }
+  .news-item { padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .news-item:last-child { border-bottom: none; }
+  .news-item .ni-date { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  .news-item .ni-title { font-size: 12px; font-weight: 600; color: var(--text); margin-top: 2px; line-height: 1.4; }
+  .ni-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); margin-right: 5px; vertical-align: middle; }
+
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .info-block { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .info-block .ib-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 5px; }
+  .info-block .ib-value { font-weight: 700; font-size: 14px; }
+  .info-block .ib-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .feature-list { display: flex; flex-direction: column; gap: 8px; }
+  .feature-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; }
+  .feature-item .fi-icon { font-size: 17px; flex-shrink: 0; width: 30px; text-align: center; }
+  .feature-item .fi-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .feature-item .fi-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .fi-status { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-left: auto; flex-shrink: 0; align-self: flex-start; }
+  .fi-confirmed { background: rgba(62,207,142,.15); color: var(--green); }
+  .fi-leaked { background: rgba(247,201,72,.1); color: var(--accent); }
+  .char-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .char-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .char-card-header { height: 64px; display: flex; align-items: flex-end; padding: 10px; font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+  .char-header-lucia { background: linear-gradient(135deg,#1a0a20,#2d1040); border-bottom: 2px solid var(--purple); }
+  .char-header-jason { background: linear-gradient(135deg,#0a1520,#102040); border-bottom: 2px solid var(--blue); }
+  .char-card-body { padding: 12px; }
+  .char-card-name { font-weight: 800; font-size: 15px; margin-bottom: 3px; }
+  .char-card-role { font-size: 11px; color: var(--muted); margin-bottom: 7px; }
+  .char-card-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .char-stat { display: flex; justify-content: space-between; padding: 4px 0; border-top: 1px solid var(--border); margin-top: 7px; font-size: 11px; }
+  .char-stat span:first-child { color: var(--muted); }
+  .char-stat span:last-child { font-weight: 600; }
+  .map-preview { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .map-visual { background: linear-gradient(135deg,#0a1a10,#102030,#1a1005); border-radius: 8px; height: 140px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border: 1px solid var(--border); }
+  .map-visual::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 40% 60%,rgba(62,207,142,.08) 0%,transparent 60%),radial-gradient(circle at 70% 30%,rgba(59,130,246,.06) 0%,transparent 40%); }
+  .map-overlay { text-align: center; position: relative; z-index: 1; }
+  .map-overlay .mo-title { font-size: 17px; font-weight: 800; color: var(--accent); letter-spacing: 2px; }
+  .map-overlay .mo-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .map-overlay .mo-badge { display: inline-block; background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 3px 12px; font-size: 10px; color: var(--muted); margin-top: 7px; }
+  .locations-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .location-item { background: var(--bg3); border-radius: 7px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; }
+  .location-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .location-item .li-name { font-size: 12px; font-weight: 600; }
+  .location-item .li-type { font-size: 10px; color: var(--muted); }
+  .weapon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .weapon-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 11px; }
+  .weapon-item .wi-cat { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 3px; }
+  .weapon-item .wi-name { font-size: 13px; font-weight: 700; }
+  .weapon-item .wi-note { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .activity-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .activity-tag { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; font-size: 12px; display: flex; align-items: center; gap: 5px; }
+  .at-new { border-color: var(--accent2); color: var(--accent2); }
+  .dsgvo-notice { background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--green); border-radius: 8px; padding: 11px 14px; display: flex; gap: 10px; align-items: flex-start; margin-bottom: 18px; }
+  .dsgvo-notice .dn-title { font-size: 12px; font-weight: 700; margin-bottom: 2px; color: var(--green); }
+  .dsgvo-notice .dn-text { font-size: 11px; color: var(--muted); line-height: 1.6; }
+  .dn-link { color: var(--accent); cursor: pointer; text-decoration: underline; }
+
+  /* FORUM */
+  .forum-layout { display: grid; grid-template-columns: 1fr 260px; gap: 20px; }
+  @media (max-width: 820px) { .forum-layout { grid-template-columns: 1fr; } }
+  .cat-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .cat-chip { padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--bg2); color: var(--muted); transition: all .15s; }
+  .cat-chip:hover { color: var(--text); }
+  .cat-chip.active { color: #000; border-color: transparent; }
+  .cat-chip[data-cat="Alle"].active      { background: var(--accent); }
+  .cat-chip[data-cat="News"].active      { background: var(--accent2); }
+  .cat-chip[data-cat="Gameplay"].active  { background: var(--blue); }
+  .cat-chip[data-cat="Story"].active     { background: var(--purple); }
+  .cat-chip[data-cat="Karte"].active     { background: var(--green); color:#000; }
+  .cat-chip[data-cat="Allgemein"].active { background: var(--muted); }
+  .post-list { display: flex; flex-direction: column; gap: 10px; }
+  .post-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; cursor: pointer; transition: all .15s; }
+  .post-card:hover { border-color: var(--accent); background: var(--card-hover); }
+  .post-card-top { display: flex; align-items: flex-start; gap: 12px; }
+  .post-avatar { width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; color: #000; }
+  .post-main { flex: 1; min-width: 0; }
+  .post-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
+  .post-excerpt { font-size: 12px; color: var(--muted); line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .post-meta { display: flex; align-items: center; gap: 12px; margin-top: 10px; font-size: 11px; color: var(--muted); flex-wrap: wrap; }
+  .post-meta .pm-cat { padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 10px; }
+  .cat-News     { background: rgba(224,92,42,.2);  color: var(--accent2); }
+  .cat-Gameplay { background: rgba(59,130,246,.15); color: var(--blue); }
+  .cat-Story    { background: rgba(168,85,247,.15); color: var(--purple); }
+  .cat-Karte    { background: rgba(62,207,142,.15); color: var(--green); }
+  .cat-Allgemein{ background: rgba(138,143,168,.15);color: var(--muted); }
+  .post-meta .pm-like { color: var(--accent2); cursor: pointer; }
+  .new-post-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 18px; }
+  .new-post-box h3 { font-size: 14px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .form-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 160px; }
+  .form-group label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .7px; }
+  .form-input { background: var(--bg3); border: 1px solid var(--border); border-radius: 7px; padding: 8px 12px; color: var(--text); font-size: 13px; font-family: inherit; width: 100%; transition: border .15s; }
+  .form-input:focus { outline: none; border-color: var(--accent); }
+  .form-select { background: var(--bg3); border: 1px solid var(--border); border-radius: 7px; padding: 8px 12px; color: var(--text); font-size: 13px; font-family: inherit; width: 100%; cursor: pointer; }
+  .form-select:focus { outline: none; border-color: var(--accent); }
+  .form-textarea { background: var(--bg3); border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px; color: var(--text); font-size: 13px; font-family: inherit; width: 100%; resize: vertical; min-height: 90px; transition: border .15s; }
+  .form-textarea:focus { outline: none; border-color: var(--accent); }
+  .char-counter { font-size: 10px; color: var(--muted); text-align: right; margin-top: 3px; }
+  .form-error { font-size: 11px; color: var(--red); margin-top: 4px; display: none; }
+  .form-error.show { display: block; }
+  #post-detail { display: none; }
+  #post-detail.open { display: block; }
+  .post-detail-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 22px; margin-bottom: 16px; }
+  .post-detail-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+  .post-detail-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; line-height: 1.3; }
+  .post-detail-meta { font-size: 12px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .post-detail-body { font-size: 13px; color: var(--muted); line-height: 1.8; border-top: 1px solid var(--border); padding-top: 14px; }
+  .post-actions { display: flex; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .action-btn { background: var(--bg3); border: 1px solid var(--border); border-radius: 7px; padding: 6px 14px; font-size: 12px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all .15s; }
+  .action-btn:hover { color: var(--text); border-color: var(--accent); }
+  .action-btn.liked { color: var(--accent2); border-color: var(--accent2); }
+  .comments-section { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .comments-header { background: var(--bg3); padding: 12px 18px; font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .comment-list { padding: 4px 0; }
+  .comment-item { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; }
+  .comment-item:last-child { border-bottom: none; }
+  .comment-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: #000; }
+  .comment-body { flex: 1; }
+  .comment-author { font-size: 12px; font-weight: 700; margin-bottom: 3px; display: flex; align-items: center; gap: 8px; }
+  .comment-date { font-size: 10px; color: var(--muted); font-weight: 400; }
+  .comment-text { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .comment-like { font-size: 11px; color: var(--muted); cursor: pointer; margin-top: 5px; display: inline-flex; align-items: center; gap: 4px; }
+  .comment-like:hover { color: var(--accent2); }
+  .no-comments { padding: 24px 18px; text-align: center; color: var(--muted); font-size: 13px; }
+  .add-comment-box { padding: 16px 18px; border-top: 1px solid var(--border); background: var(--bg3); }
+  .add-comment-box h4 { font-size: 12px; font-weight: 700; margin-bottom: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .7px; }
+  .forum-sidebar { display: flex; flex-direction: column; gap: 14px; }
+  .forum-stats { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; }
+  .top-poster { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .top-poster:last-child { border-bottom: none; }
+  .tp-rank { font-size: 11px; color: var(--muted); width: 18px; }
+  .tp-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #000; flex-shrink: 0; }
+  .tp-name { flex: 1; font-weight: 600; }
+  .tp-posts { font-size: 11px; color: var(--muted); }
+  #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--green); color: #000; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; opacity: 0; transition: all .3s; z-index: 9998; pointer-events: none; white-space: nowrap; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .footer { border-top: 1px solid var(--border); padding: 18px 24px; }
+  .footer-inner { max-width: 1140px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center; }
+  .footer-links { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; }
+  .footer-links a { color: var(--muted); font-size: 12px; text-decoration: none; cursor: pointer; }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-note { font-size: 11px; color: var(--muted); }
+  .footer-dsgvo { font-size: 11px; color: var(--muted); background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 7px 14px; }
+  .footer-dsgvo strong { color: var(--green); }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  option { background: #1a1e2a; }
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<div id="cookie-banner">
+  <div class="cb-text">
+    <strong>🍪 Cookie-Hinweis (DSGVO)</strong> – Diese Seite verwendet ausschließlich sitzungsbasierte Speicherung (kein Tracking, keine Drittanbieter). Es werden keine personenbezogenen Daten dauerhaft gespeichert. <a onclick="openModal('dsgvo')">Datenschutzerklärung</a>
+  </div>
+  <div class="cb-actions">
+    <button class="cb-btn cb-reject" onclick="closeBanner()">Ablehnen</button>
+    <button class="cb-btn cb-accept" onclick="acceptCookies()">Verstanden ✓</button>
+  </div>
+</div>
+
+<div id="modal-dsgvo" class="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('dsgvo')">✕ Schließen</button>
+    <h2>🔒 Datenschutzerklärung</h2>
+    <p>Diese Seite wurde DSGVO-konform gestaltet (EU 2016/679).</p>
+    <h3>1. Datenerhebung</h3>
+    <p>Es werden <strong>keine personenbezogenen Daten</strong> dauerhaft gespeichert. Forum-Beiträge und Kommentare existieren nur für die Dauer der aktuellen Browsersitzung und werden nicht an Server übertragen.</p>
+    <h3>2. Externe Ressourcen</h3>
+    <p>Diese Seite lädt <strong>keine externen Fonts, Skripte oder Tracker</strong>. Kein Google Analytics, kein CDN-Tracking, keine YouTube-Einbettungen.</p>
+    <h3>3. Forum-Funktion</h3>
+    <p>Beiträge und Kommentare werden ausschließlich <strong>im Arbeitsspeicher des Browsers</strong> gehalten (in-memory). Nach dem Schließen des Tabs sind alle Daten gelöscht.</p>
+    <h3>4. Urheberrecht</h3>
+    <p>GTA VI ist eine Marke von Rockstar Games / Take-Two Interactive. Dies ist ein inoffizielles Fan-Projekt ohne kommerzielle Absicht.</p>
+    <h3>5. Ihre Rechte (Art. 15–17 DSGVO)</h3>
+    <p>Da keine Daten gespeichert werden, sind Auskunfts- und Löschungsansprüche gegenstandslos.</p>
+    <br>
+    <button class="cb-btn cb-accept" onclick="closeModal('dsgvo')" style="width:100%">Verstanden</button>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-brand" onclick="navigateTo('wiki')">
+    <div class="ql-logo">G6</div>
+    <span>GTA<span class="brand-sub">6Wiki</span></span>
+  </div>
+  <div class="topbar-right">
+    <span class="user-pill" onclick="showToast('Login-Funktion folgt bald!')">🔑 Anmelden</span>
+  </div>
+</div>
+
+<div id="hero-section">
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-cover">
+        <div class="cover-vi">VI</div>
+        <div class="cover-sub">GTA</div>
+      </div>
+      <div class="hero-info">
+        <div class="hero-breadcrumb">GTA6Wiki › Grand Theft Auto VI</div>
+        <div class="hero-title">Grand Theft Auto <span>VI</span></div>
+        <div class="hero-meta">
+          <div class="hero-tag"><strong>Entwickler:</strong> Rockstar Games</div>
+          <div class="hero-tag"><strong>Genre:</strong> Open-World-Action</div>
+          <div class="hero-tag"><strong>Schauplatz:</strong> Leonida / Vice City</div>
+          <div class="hero-tag"><strong>Plattform:</strong> PS5 · Xbox Series X|S</div>
+        </div>
+        <p class="hero-desc">Das meisterwartete Open-World-Spiel aller Zeiten. GTA VI kehrt nach Vice City zurück – eingebettet in den riesigen fiktiven Bundesstaat Leonida.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="navigateTo('forum')">💬 Zum Forum</button>
+          <button class="btn btn-outline" onclick="showToast('Interaktive Karte folgt!')">🗺️ Interaktive Karte</button>
+          <div class="release-pill">
+            <span class="rp-label">Erscheinungsdatum</span>
+            <span class="rp-date">19. Nov. 2026</span>
+            <span class="rp-platform">PS5 · Xbox Series X|S</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-bar">
+  <div class="tabs-inner">
+    <button class="tab-btn active" id="tab-wiki" onclick="navigateTo('wiki')">📖 Wiki</button>
+    <button class="tab-btn" id="tab-chars" onclick="navigateTo('chars')">👥 Charaktere</button>
+    <button class="tab-btn" id="tab-world" onclick="navigateTo('world')">🗺️ Welt &amp; Karte</button>
+    <button class="tab-btn" id="tab-gameplay" onclick="navigateTo('gameplay')">🎮 Gameplay</button>
+    <button class="tab-btn" id="tab-forum" onclick="navigateTo('forum')">💬 Forum <span class="badge-count" id="forum-badge">0</span></button>
+    <button class="tab-btn" id="tab-news" onclick="navigateTo('news')">📰 News <span class="badge-new">NEU</span></button>
+  </div>
+</div>
+
+<!-- WIKI -->
+<div id="page-wiki" class="page-view active">
+  <div class="main">
+    <div>
+      <div class="dsgvo-notice">
+        <div>🛡️</div>
+        <div>
+          <div class="dn-title">DSGVO-konform &amp; datenschutzfreundlich</div>
+          <div class="dn-text">Kein Tracking, keine externen Skripte, keine dauerhaften Cookies. <span class="dn-link" onclick="openModal('dsgvo')">Datenschutzerklärung →</span></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title"><div class="dot"></div> Schnellzugriff</div>
+        <div class="nav-cards">
+          <div class="nav-card nc-orange" onclick="navigateTo('world')"><div class="nc-icon">🗺️</div><div class="nc-title">Interaktive Karte</div><div class="nc-count">Leonida · Vice City · Keys</div></div>
+          <div class="nav-card nc-yellow" onclick="showToast('Missionen-Guide folgt!')"><div class="nc-icon">🎯</div><div class="nc-title">Missionen</div><div class="nc-count">60–85 Hauptstory-Missionen</div></div>
+          <div class="nav-card nc-blue" onclick="navigateTo('chars')"><div class="nc-icon">👥</div><div class="nc-title">Charaktere</div><div class="nc-count">Jason · Lucia + NPC-Cast</div></div>
+          <div class="nav-card nc-green" onclick="navigateTo('gameplay')"><div class="nc-icon">🔫</div><div class="nc-title">Waffen &amp; Gameplay</div><div class="nc-count">Pistolen, ARs, Scharfschützen</div></div>
+          <div class="nav-card nc-red" onclick="showToast('Fahrzeug-Datenbank folgt!')"><div class="nc-icon">🚗</div><div class="nc-title">Fahrzeuge</div><div class="nc-count">Autos, Boote, Helikopter</div></div>
+          <div class="nav-card nc-purple" onclick="navigateTo('forum')"><div class="nc-icon">💬</div><div class="nc-title">Forum</div><div class="nc-count">Diskutiere mit der Community</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title"><div class="dot"></div> Über das Spiel</div>
+        <div class="info-grid">
+          <div class="info-block"><div class="ib-label">Erscheinungsdatum</div><div class="ib-value" style="color:var(--accent)">19. November 2026</div><div class="ib-sub">PS5 · Xbox Series X|S</div></div>
+          <div class="info-block"><div class="ib-label">Entwickler</div><div class="ib-value">Rockstar Games</div><div class="ib-sub">Publisher: Take-Two Interactive</div></div>
+          <div class="info-block"><div class="ib-label">Schauplatz</div><div class="ib-value">Vice City · Leonida</div><div class="ib-sub">Angelehnt an Miami / Florida</div></div>
+          <div class="info-block"><div class="ib-label">Protagonisten</div><div class="ib-value">Jason &amp; Lucia</div><div class="ib-sub">Dual-Protagonist-System</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="countdown-box">
+        <div class="cd-label">⏳ Countdown zum Release</div>
+        <div class="cd-grid">
+          <div class="cd-unit"><div class="cd-num" id="cd-days">--</div><div class="cd-lbl">Tage</div></div>
+          <div class="cd-sep">:</div>
+          <div class="cd-unit"><div class="cd-num" id="cd-hours">--</div><div class="cd-lbl">Std.</div></div>
+          <div class="cd-sep">:</div>
+          <div class="cd-unit"><div class="cd-num" id="cd-mins">--</div><div class="cd-lbl">Min.</div></div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--muted)">19. November 2026</div>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">📋 Spielinfo</div>
+        <div class="sidebar-card-body">
+          <div class="meta-row"><span class="mr-key">Entwickler</span><span class="mr-val">Rockstar Games</span></div>
+          <div class="meta-row"><span class="mr-key">Release</span><span class="mr-val mr-yellow">19. Nov. 2026</span></div>
+          <div class="meta-row"><span class="mr-key">Plattformen</span><span class="mr-val">PS5 · XSX|S</span></div>
+          <div class="meta-row"><span class="mr-key">PC-Version</span><span class="mr-val">TBA</span></div>
+          <div class="meta-row"><span class="mr-key">Status</span><span class="mr-val mr-green">✓ In Entwicklung</span></div>
+        </div>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">📰 Letzte News</div>
+        <div class="sidebar-card-body">
+          <div class="news-item"><div class="ni-date">Sept. 2025</div><div class="ni-title"><span class="ni-dot"></span>Release auf 19. Nov. 2026 verschoben</div></div>
+          <div class="news-item"><div class="ni-date">Mai 2025</div><div class="ni-title"><span class="ni-dot"></span>Trailer 2 – Story &amp; Gameplay enthüllt</div></div>
+          <div class="news-item"><div class="ni-date">Dez. 2023</div><div class="ni-title"><span class="ni-dot"></span>Trailer 1 – Lucia als Protagonistin bestätigt</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHARAKTERE -->
+<div id="page-chars" class="page-view">
+  <div class="main">
+    <div>
+      <div class="section">
+        <div class="section-title"><div class="dot"></div> Protagonisten</div>
+        <div class="char-cards">
+          <div class="char-card">
+            <div class="char-card-header char-header-lucia">Protagonistin I</div>
+            <div class="char-card-body">
+              <div class="char-card-name">Lucia Caminos</div>
+              <div class="char-card-role">Kriminelle · Erste weibliche GTA-Protagonistin</div>
+              <div class="char-card-desc">Ursprünglich aus Liberty City, landete im Leonida-Staatsgefängnis. Nach ihrer Entlassung schließt sie sich mit Jason zusammen.</div>
+              <div class="char-stat"><span>Herkunft</span><span>Liberty City</span></div>
+              <div class="char-stat"><span>Status</span><span>Ex-Häftling</span></div>
+              <div class="char-stat"><span>Besonderheit</span><span>Erste weibliche Hauptrolle 🏅</span></div>
+            </div>
+          </div>
+          <div class="char-card">
+            <div class="char-card-header char-header-jason">Protagonist II</div>
+            <div class="char-card-body">
+              <div class="char-card-name">Jason Duval</div>
+              <div class="char-card-role">Krimineller · Armeeveteran</div>
+              <div class="char-card-desc">Ehemaliger Soldat in den Leonida Keys als Fahrer für lokale Drogenhändler. Als ein Coup schiefläuft, geraten er und Lucia in eine Verschwörung.</div>
+              <div class="char-stat"><span>Herkunft</span><span>Leonida Keys</span></div>
+              <div class="char-stat"><span>Vergangenheit</span><span>Armeedienst</span></div>
+              <div class="char-stat"><span>Archetypus</span><span>Bonnie &amp; Clyde ❤️</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">👥 Charakterinfos</div>
+        <div class="sidebar-card-body">
+          <div class="meta-row"><span class="mr-key">Protagonisten</span><span class="mr-val">2</span></div>
+          <div class="meta-row"><span class="mr-key">Wechselsystem</span><span class="mr-val mr-green">✓ Bestätigt</span></div>
+          <div class="meta-row"><span class="mr-key">Weibliche Heldin</span><span class="mr-val mr-yellow">Erstmalig</span></div>
+          <div class="meta-row"><span class="mr-key">Story-Typ</span><span class="mr-val">Bonnie &amp; Clyde</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WELT -->
+<div id="page-world" class="page-view">
+  <div class="main">
+    <div>
+      <div class="section">
+        <div class="section-title"><div class="dot"></div> Welt &amp; Karte</div>
+        <div class="map-preview">
+          <div class="map-visual">
+            <div class="map-overlay">
+              <div class="mo-title">LEONIDA</div>
+              <div class="mo-sub">Bundesstaat Leonida · Angelehnt an Florida</div>
+              <div class="mo-badge">Größer als GTA Vs Los Santos + Blaine County zusammen</div>
+            </div>
+          </div>
+          <div class="locations-grid">
+            <div class="location-item"><div class="location-dot" style="background:#f7c948"></div><div><div class="li-name">Vice City</div><div class="li-type">Hauptstadt · Miami-inspiriert</div></div></div>
+            <div class="location-item"><div class="location-dot" style="background:#3b82f6"></div><div><div class="li-name">Leonida Keys</div><div class="li-type">Inselkette · Jasons Heimat</div></div></div>
+            <div class="location-item"><div class="location-dot" style="background:#3ecf8e"></div><div><div class="li-name">Mount Kalaga</div><div class="li-type">Nationalpark · Jagd &amp; Wildlife</div></div></div>
+            <div class="location-item"><div class="location-dot" style="background:#e05c2a"></div><div><div class="li-name">Port Gellhorn</div><div class="li-type">Hafengebiet</div></div></div>
+            <div class="location-item"><div class="location-dot" style="background:#a855f7"></div><div><div class="li-name">Ambrosia</div><div class="li-type">Bestätigte Region</div></div></div>
+            <div class="location-item"><div class="location-dot" style="background:#ec4899"></div><div><div class="li-name">Grassrivers</div><div class="li-type">Bestätigte Region</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">🌍 Karteninfos</div>
+        <div class="sidebar-card-body">
+          <div class="meta-row"><span class="mr-key">Hauptstadt</span><span class="mr-val">Vice City</span></div>
+          <div class="meta-row"><span class="mr-key">Staat</span><span class="mr-val">Leonida</span></div>
+          <div class="meta-row"><span class="mr-key">Vorbild</span><span class="mr-val">Florida / Miami</span></div>
+          <div class="meta-row"><span class="mr-key">Kartengröße</span><span class="mr-val mr-green">Größer als GTA V</span></div>
+          <div class="meta-row"><span class="mr-key">Regionen</span><span class="mr-val">6+ bestätigt</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GAMEPLAY -->
+<div id="page-gameplay" class="page-view">
+  <div class="main">
+    <div>
+      <div class="section">
+        <div class="section-title"><div class="dot"></div> Gameplay-Features</div>
+        <div class="feature-list">
+          <div class="feature-item"><div class="fi-icon">🚔</div><div><div class="fi-title">Überarbeitetes Polizei- &amp; Fahndungssystem</div><div class="fi-desc">6-Sterne-Fahndungslevel kehrt zurück. Polizei-KI koordiniert Straßensperren und bietet die Option zur Kapitulation.</div></div><div class="fi-status fi-confirmed">Bestätigt</div></div>
+          <div class="feature-item"><div class="fi-icon">🤖</div><div><div class="fi-title">Reaktive NPC-Welt</div><div class="fi-desc">NPCs reagieren dynamisch auf gezogene Waffen, flüchten und rufen die Polizei.</div></div><div class="fi-status fi-confirmed">Bestätigt</div></div>
+          <div class="feature-item"><div class="fi-icon">🔀</div><div><div class="fi-title">Dual-Protagonist-Wechsel</div><div class="fi-desc">Spieler können zwischen Jason und Lucia wechseln.</div></div><div class="fi-status fi-confirmed">Bestätigt</div></div>
+          <div class="feature-item"><div class="fi-icon">📱</div><div><div class="fi-title">Hacking &amp; Überwachung</div><div class="fi-desc">Smartphone-basiertes Hacken von Sicherheitssystemen.</div></div><div class="fi-status fi-leaked">Wahrscheinlich</div></div>
+          <div class="feature-item"><div class="fi-icon">📣</div><div><div class="fi-title">Social-Media-Ansehen</div><div class="fi-desc">Ruhm und Schande verbreiten sich über ein fiktives soziales Netzwerk.</div></div><div class="fi-status fi-confirmed">Bestätigt</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title"><div class="dot"></div> Bestätigte Waffen</div>
+        <div class="weapon-grid">
+          <div class="weapon-item"><div class="wi-cat">Pistole</div><div class="wi-name">Duke .357 Mustang</div><div class="wi-note">Handkanone</div></div>
+          <div class="weapon-item"><div class="wi-cat">Pistole</div><div class="wi-name">Glock-Variante</div><div class="wi-note">Umfangreiche Anpassungsoptionen</div></div>
+          <div class="weapon-item"><div class="wi-cat">Sturmgewehr</div><div class="wi-name">AR-15 / M4-Varianten</div><div class="wi-note">Taktische Upgrades</div></div>
+          <div class="weapon-item"><div class="wi-cat">Schrotflinte</div><div class="wi-name">Doppelläufige Schrotflinte</div><div class="wi-note">Klappmechanismus</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title"><div class="dot"></div> Aktivitäten</div>
+        <div class="activity-tags">
+          <div class="activity-tag at-new">⛳ Minigolf <span class="badge-new">NEU</span></div>
+          <div class="activity-tag at-new">🚣 Kajak <span class="badge-new">NEU</span></div>
+          <div class="activity-tag">🎣 Angeln</div>
+          <div class="activity-tag">🏀 Basketball</div>
+          <div class="activity-tag">🎱 Billard</div>
+          <div class="activity-tag">💪 Fitnessstudio</div>
+          <div class="activity-tag">🎲 Würfelspiele</div>
+          <div class="activity-tag">🏎️ Straßenrennen</div>
+          <div class="activity-tag">🤿 Tauchen</div>
+          <div class="activity-tag">🦌 Jagd</div>
+          <div class="activity-tag">🏦 Überfälle</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">🎮 Gameplay-Stats</div>
+        <div class="sidebar-card-body">
+          <div class="meta-row"><span class="mr-key">Hauptmissionen</span><span class="mr-val">60–85</span></div>
+          <div class="meta-row"><span class="mr-key">Aktivitäten</span><span class="mr-val">15+ bestätigt</span></div>
+          <div class="meta-row"><span class="mr-key">Waffenkategorien</span><span class="mr-val">6+</span></div>
+          <div class="meta-row"><span class="mr-key">Fahndungslevel</span><span class="mr-val mr-yellow">6 Sterne</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEWS -->
+<div id="page-news" class="page-view">
+  <div class="main-full">
+    <div class="section">
+      <div class="section-title"><div class="dot"></div> Aktuelle News &amp; Updates</div>
+      <div class="feature-list">
+        <div class="feature-item"><div class="fi-icon">📅</div><div><div class="fi-title">GTA VI offiziell auf 19. November 2026 datiert</div><div class="fi-desc">September 2025 – Rockstar Games hat nach zwei Verschiebungen das finale Datum bekannt gegeben.</div></div><div class="fi-status fi-confirmed">Offiziell</div></div>
+        <div class="feature-item"><div class="fi-icon">🎬</div><div><div class="fi-title">Trailer 2 – Story &amp; Gameplay enthüllt</div><div class="fi-desc">Mai 2025 – Der zweite Trailer zeigt Missionen, Fahrzeuge, Waffen und die Bonnie-&-Clyde-Dynamik.</div></div><div class="fi-status fi-confirmed">Offiziell</div></div>
+        <div class="feature-item"><div class="fi-icon">📅</div><div><div class="fi-title">Erster Release-Aufschub: 2025 → Mai 2026</div><div class="fi-desc">April 2025 – Rockstar verschob den Release auf den 26. Mai 2026.</div></div><div class="fi-status fi-confirmed">Offiziell</div></div>
+        <div class="feature-item"><div class="fi-icon">🎬</div><div><div class="fi-title">Trailer 1 – Lucia als Protagonistin bestätigt</div><div class="fi-desc">Dezember 2023 – Über 90 Millionen Aufrufe in 24 Stunden.</div></div><div class="fi-status fi-confirmed">Offiziell</div></div>
+        <div class="feature-item"><div class="fi-icon">💥</div><div><div class="fi-title">Massiver Gameplay-Leak aus frühem Build</div><div class="fi-desc">September 2022 – Über 90 Gameplay-Clips gelangten ins Internet.</div></div><div class="fi-status fi-leaked">Leak</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FORUM -->
+<div id="page-forum" class="page-view">
+  <div class="main-full">
+    <div id="post-detail">
+      <button class="btn btn-outline btn-sm" onclick="closePostDetail()" style="margin-bottom:14px">← Zurück zum Forum</button>
+      <div class="post-detail-card" id="detail-card"></div>
+      <div class="comments-section">
+        <div class="comments-header">💬 Kommentare <span class="badge-count" id="comment-count-badge">0</span></div>
+        <div class="comment-list" id="comment-list"></div>
+        <div class="add-comment-box">
+          <h4>Kommentar schreiben</h4>
+          <div class="form-row">
+            <div class="form-group" style="max-width:200px">
+              <label>Dein Name *</label>
+              <input class="form-input" id="comment-author" placeholder="z.B. GTA_Fan_DE" maxlength="30"/>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:10px">
+            <label>Kommentar *</label>
+            <textarea class="form-textarea" id="comment-text" placeholder="Dein Kommentar..." maxlength="500" style="min-height:70px" oninput="updateCounter('comment-text','comment-counter',500)"></textarea>
+            <div class="char-counter" id="comment-counter">0 / 500</div>
+            <div class="form-error" id="comment-error">Bitte Name und Kommentar ausfüllen.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="submitComment()">Kommentar posten ✓</button>
+        </div>
+      </div>
+    </div>
+    <div id="forum-overview">
+      <div class="forum-layout">
+        <div>
+          <div class="new-post-box">
+            <h3>✍️ Neuen Beitrag erstellen</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Dein Name *</label>
+                <input class="form-input" id="post-author" placeholder="z.B. GTA_Fan_DE" maxlength="30"/>
+              </div>
+              <div class="form-group" style="max-width:180px">
+                <label>Kategorie *</label>
+                <select class="form-select" id="post-category">
+                  <option value="">– wählen –</option>
+                  <option value="News">📰 News</option>
+                  <option value="Gameplay">🎮 Gameplay</option>
+                  <option value="Story">📖 Story</option>
+                  <option value="Karte">🗺️ Karte</option>
+                  <option value="Allgemein">💬 Allgemein</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:10px">
+              <label>Titel *</label>
+              <input class="form-input" id="post-title" placeholder="Dein Beitragstitel..." maxlength="80"/>
+            </div>
+            <div class="form-group" style="margin-bottom:10px">
+              <label>Inhalt *</label>
+              <textarea class="form-textarea" id="post-content" placeholder="Schreibe deinen Beitrag..." maxlength="1000" oninput="updateCounter('post-content','post-counter',1000)"></textarea>
+              <div class="char-counter" id="post-counter">0 / 1000</div>
+              <div class="form-error" id="post-error">Bitte alle Pflichtfelder (*) ausfüllen.</div>
+            </div>
+            <button class="btn btn-primary" onclick="submitPost()">Beitrag veröffentlichen 🚀</button>
+          </div>
+          <div class="cat-chips">
+            <div class="cat-chip active" data-cat="Alle" onclick="filterPosts('Alle',this)">Alle</div>
+            <div class="cat-chip" data-cat="News" onclick="filterPosts('News',this)">📰 News</div>
+            <div class="cat-chip" data-cat="Gameplay" onclick="filterPosts('Gameplay',this)">🎮 Gameplay</div>
+            <div class="cat-chip" data-cat="Story" onclick="filterPosts('Story',this)">📖 Story</div>
+            <div class="cat-chip" data-cat="Karte" onclick="filterPosts('Karte',this)">🗺️ Karte</div>
+            <div class="cat-chip" data-cat="Allgemein" onclick="filterPosts('Allgemein',this)">💬 Allgemein</div>
+          </div>
+          <div class="post-list" id="post-list"></div>
+        </div>
+        <div class="forum-sidebar">
+          <div class="sidebar-card">
+            <div class="sidebar-card-header">📊 Forum-Statistiken</div>
+            <div class="sidebar-card-body">
+              <div class="meta-row"><span class="mr-key">Beiträge gesamt</span><span class="mr-val mr-yellow" id="stat-posts">0</span></div>
+              <div class="meta-row"><span class="mr-key">Kommentare</span><span class="mr-val" id="stat-comments">0</span></div>
+              <div class="meta-row"><span class="mr-key">Likes vergeben</span><span class="mr-val" id="stat-likes">0</span></div>
+              <div class="meta-row"><span class="mr-key">Aktive Mitglieder</span><span class="mr-val mr-green" id="stat-members">0</span></div>
+            </div>
+          </div>
+          <div class="forum-stats sidebar-card">
+            <div class="sidebar-card-header">🏆 Aktivste Nutzer</div>
+            <div id="top-posters"></div>
+          </div>
+          <div class="sidebar-card">
+            <div class="sidebar-card-header">📌 Regeln</div>
+            <div class="sidebar-card-body" style="font-size:12px;color:var(--muted);line-height:1.7">
+              1. Respektvoller Umgang<br>2. Keine Spoiler ohne Warnung<br>3. Richtige Kategorie wählen<br>4. Keine persönlichen Daten<br>5. Spaß haben! 🎉
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-inner">
+    <div class="footer-dsgvo"><strong>🛡️ DSGVO:</strong> Kein Tracking · Keine externen Ressourcen · Beiträge nur sitzungsbasiert im Browser</div>
+    <div class="footer-links">
+      <a onclick="openModal('dsgvo')">Datenschutzerklärung</a>
+      <a onclick="openModal('dsgvo')">Impressum</a>
+      <a onclick="openModal('dsgvo')">Cookie-Einstellungen</a>
+    </div>
+    <div class="footer-note">GTA6Wiki · Inoffizielles Fan-Projekt · Grand Theft Auto VI ist eine Marke von Rockstar Games / Take-Two Interactive · Stand: April 2026</div>
+  </div>
+</div>
+
+<script>
+const AVATAR_COLORS=['#f7c948','#e05c2a','#3b82f6','#3ecf8e','#a855f7','#ec4899','#f97316','#06b6d4'];
+function avatarColor(n){let h=0;for(let c of n)h=(h*31+c.charCodeAt(0))&0xffff;return AVATAR_COLORS[h%AVATAR_COLORS.length];}
+function avatarLetter(n){return n.trim().charAt(0).toUpperCase()||'?';}
+function timeAgo(ts){const d=Date.now()-ts,m=Math.floor(d/60000),h=Math.floor(d/3600000);if(d<60000)return'Gerade eben';if(m<60)return`vor ${m} Min.`;if(h<24)return`vor ${h} Std.`;return`vor ${Math.floor(h/24)} Tagen`;}
+let posts=[
+  {id:1,author:'RockstarFan_DE',category:'News',title:'GTA VI Release endlich bestätigt: 19. November 2026!',content:'Rockstar hat es offiziell gemacht – der finale Release-Termin steht. Nach zwei Verschiebungen erscheint GTA VI am 19. November 2026 für PS5 und Xbox Series X|S. Was denkt ihr – wird das Warten sich lohnen?',ts:Date.now()-7200000,likes:12,likedByMe:false,comments:[]},
+  {id:2,author:'ViceCityVibes',category:'Story',title:'Lucia Caminos – Die beste GTA-Protagonistin aller Zeiten?',content:'Seitdem Trailer 2 draußen ist, kann ich nicht aufhören, über Lucias Charakterentwicklung nachzudenken. Die Bonnie-&-Clyde-Dynamik mit Jason ist absolut frisch für die Reihe.',ts:Date.now()-3600000,likes:8,likedByMe:false,comments:[{id:1,author:'GTA_Veteran',text:'Definitiv! Sie hat schon mehr Tiefe als die meisten GTA-Protagonisten.',ts:Date.now()-1800000,likes:3,likedByMe:false}]},
+  {id:3,author:'LeonidaExplorer',category:'Karte',title:'Wie groß wird die Karte wirklich?',content:'Basierend auf Trailer-Vergleichen und den 6+ bestätigten Regionen schätze ich die Karte auf mindestens 2x GTA V. Was meint ihr?',ts:Date.now()-1800000,likes:5,likedByMe:false,comments:[]},
+  {id:4,author:'GTA_Gameplay_Nerd',category:'Gameplay',title:'Das neue Polizei-KI System klingt EPISCH',content:'Das 6-Sterne-Fahndungssystem mit verzögerten Reaktionen und taktischen Straßensperren – genau das worauf ich seit GTA IV gewartet habe!',ts:Date.now()-900000,likes:7,likedByMe:false,comments:[]},
+];
+let nextPostId=5,nextCommentId=100,currentFilter='Alle',currentPostId=null;
+
+const pages=['wiki','chars','world','gameplay','forum','news'];
+function navigateTo(page){
+  pages.forEach(p=>{document.getElementById('page-'+p).classList.toggle('active',p===page);const t=document.getElementById('tab-'+p);if(t)t.classList.toggle('active',p===page);});
+  document.getElementById('hero-section').style.display=page==='wiki'?'':'none';
+  if(page==='forum'){renderPosts();updateStats();closePostDetail();}
+  window.scrollTo(0,0);
+}
+function updateCountdown(){const diff=new Date('2026-11-19T00:00:00')-new Date();if(diff<=0)return;document.getElementById('cd-days').textContent=Math.floor(diff/86400000);document.getElementById('cd-hours').textContent=String(Math.floor(diff%86400000/3600000)).padStart(2,'0');document.getElementById('cd-mins').textContent=String(Math.floor(diff%3600000/60000)).padStart(2,'0');}
+updateCountdown();setInterval(updateCountdown,60000);
+
+function renderPosts(){
+  const filtered=currentFilter==='Alle'?posts:posts.filter(p=>p.category===currentFilter);
+  const list=document.getElementById('post-list');
+  if(filtered.length===0){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Noch keine Beiträge in dieser Kategorie.<br><span style="font-size:11px">Sei der Erste!</span></div>';return;}
+  list.innerHTML=[...filtered].sort((a,b)=>b.ts-a.ts).map(p=>`<div class="post-card" onclick="openPost(${p.id})"><div class="post-card-top"><div class="post-avatar" style="background:${avatarColor(p.author)}">${avatarLetter(p.author)}</div><div class="post-main"><div class="post-title">${escHtml(p.title)}</div><div class="post-excerpt">${escHtml(p.content)}</div></div></div><div class="post-meta"><span class="pm-cat cat-${p.category}">${p.category}</span><span>👤 ${escHtml(p.author)}</span><span>🕐 ${timeAgo(p.ts)}</span><span>💬 ${p.comments.length} Kommentar${p.comments.length!==1?'e':''}</span><span class="pm-like" onclick="event.stopPropagation();likePost(${p.id})">❤️ ${p.likes}</span></div></div>`).join('');
+  document.getElementById('forum-badge').textContent=posts.length;
+}
+function updateStats(){
+  const tc=posts.reduce((s,p)=>s+p.comments.length,0);
+  const tl=posts.reduce((s,p)=>s+p.likes+p.comments.reduce((cs,c)=>cs+c.likes,0),0);
+  const mb=[...new Set([...posts.map(p=>p.author),...posts.flatMap(p=>p.comments.map(c=>c.author))])];
+  document.getElementById('stat-posts').textContent=posts.length;
+  document.getElementById('stat-comments').textContent=tc;
+  document.getElementById('stat-likes').textContent=tl;
+  document.getElementById('stat-members').textContent=mb.length;
+  const freq={};posts.forEach(p=>{freq[p.author]=(freq[p.author]||0)+1;p.comments.forEach(c=>{freq[c.author]=(freq[c.author]||0)+1;});});
+  const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  document.getElementById('top-posters').innerHTML=sorted.length?sorted.map(([name,cnt],i)=>`<div class="top-poster"><span class="tp-rank">#${i+1}</span><div class="tp-avatar" style="background:${avatarColor(name)}">${avatarLetter(name)}</div><span class="tp-name">${escHtml(name)}</span><span class="tp-posts">${cnt} Beitrag${cnt!==1?'e':''}</span></div>`).join(''):'<div style="padding:14px 16px;font-size:12px;color:var(--muted)">Noch keine Mitglieder.</div>';
+}
+function filterPosts(cat,el){currentFilter=cat;document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderPosts();}
+function openPost(id){
+  currentPostId=id;const p=posts.find(x=>x.id===id);if(!p)return;
+  document.getElementById('forum-overview').style.display='none';
+  document.getElementById('post-detail').style.display='block';
+  document.getElementById('detail-card').innerHTML=`<div class="post-detail-header"><div class="post-avatar" style="background:${avatarColor(p.author)};width:46px;height:46px;font-size:18px;flex-shrink:0">${avatarLetter(p.author)}</div><div><div class="post-detail-title">${escHtml(p.title)}</div><div class="post-detail-meta"><span class="pm-cat cat-${p.category}">${p.category}</span><span>👤 ${escHtml(p.author)}</span><span>🕐 ${timeAgo(p.ts)}</span></div></div></div><div class="post-detail-body">${escHtml(p.content).replace(/\n/g,'<br>')}</div><div class="post-actions"><button class="action-btn ${p.likedByMe?'liked':''}" onclick="likePost(${p.id});this.className='action-btn ${p.likedByMe?'':'liked'}';this.querySelector('span').textContent=${p.likes}">❤️ <span>${p.likes}</span> Gefällt mir</button><button class="action-btn" onclick="document.getElementById('comment-author').focus()">💬 Kommentieren</button></div>`;
+  renderComments(p);
+  document.getElementById('comment-author').value='';document.getElementById('comment-text').value='';document.getElementById('comment-counter').textContent='0 / 500';document.getElementById('comment-error').classList.remove('show');
+  window.scrollTo(0,0);
+}
+function renderComments(p){
+  const list=document.getElementById('comment-list');document.getElementById('comment-count-badge').textContent=p.comments.length;
+  if(p.comments.length===0){list.innerHTML='<div class="no-comments">Noch keine Kommentare. Sei der Erste! 💬</div>';return;}
+  list.innerHTML=p.comments.map(c=>`<div class="comment-item"><div class="comment-avatar" style="background:${avatarColor(c.author)}">${avatarLetter(c.author)}</div><div class="comment-body"><div class="comment-author">${escHtml(c.author)}<span class="comment-date">${timeAgo(c.ts)}</span></div><div class="comment-text">${escHtml(c.text).replace(/\n/g,'<br>')}</div><div class="comment-like" onclick="likeComment(${p.id},${c.id},this)">❤️ <span>${c.likes}</span></div></div></div>`).join('');
+}
+function closePostDetail(){document.getElementById('post-detail').style.display='none';document.getElementById('forum-overview').style.display='';currentPostId=null;renderPosts();updateStats();}
+function submitPost(){
+  const author=(document.getElementById('post-author').value||'').trim();const cat=document.getElementById('post-category').value;const title=(document.getElementById('post-title').value||'').trim();const content=(document.getElementById('post-content').value||'').trim();const err=document.getElementById('post-error');
+  if(!author||!cat||!title||!content){err.classList.add('show');return;}err.classList.remove('show');
+  posts.push({id:nextPostId++,author,category:cat,title,content,ts:Date.now(),likes:0,likedByMe:false,comments:[]});
+  document.getElementById('post-author').value='';document.getElementById('post-category').value='';document.getElementById('post-title').value='';document.getElementById('post-content').value='';document.getElementById('post-counter').textContent='0 / 1000';
+  renderPosts();updateStats();showToast('✅ Beitrag erfolgreich veröffentlicht!');
+}
+function submitComment(){
+  if(currentPostId===null)return;const author=(document.getElementById('comment-author').value||'').trim();const text=(document.getElementById('comment-text').value||'').trim();const err=document.getElementById('comment-error');
+  if(!author||!text){err.classList.add('show');return;}err.classList.remove('show');
+  const p=posts.find(x=>x.id===currentPostId);if(!p)return;
+  p.comments.push({id:nextCommentId++,author,text,ts:Date.now(),likes:0,likedByMe:false});
+  document.getElementById('comment-author').value='';document.getElementById('comment-text').value='';document.getElementById('comment-counter').textContent='0 / 500';
+  renderComments(p);showToast('✅ Kommentar veröffentlicht!');
+}
+function likePost(id){const p=posts.find(x=>x.id===id);if(!p)return;p.likedByMe=!p.likedByMe;p.likes+=p.likedByMe?1:-1;renderPosts();updateStats();}
+function likeComment(postId,commentId,el){const p=posts.find(x=>x.id===postId);if(!p)return;const c=p.comments.find(x=>x.id===commentId);if(!c)return;c.likedByMe=!c.likedByMe;c.likes+=c.likedByMe?1:-1;el.innerHTML=`❤️ <span>${c.likes}</span>`;el.style.color=c.likedByMe?'var(--accent2)':'var(--muted)';updateStats();}
+function updateCounter(tid,cid,max){document.getElementById(cid).textContent=`${(document.getElementById(tid).value||'').length} / ${max}`;}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+function closeBanner(){document.getElementById('cookie-banner').classList.add('hidden');sessionStorage.setItem('cookieChoice','rejected');}
+function acceptCookies(){document.getElementById('cookie-banner').classList.add('hidden');sessionStorage.setItem('cookieChoice','accepted');}
+if(sessionStorage.getItem('cookieChoice'))document.getElementById('cookie-banner').classList.add('hidden');
+function openModal(id){document.getElementById('modal-'+id).classList.add('open');}
+function closeModal(id){document.getElementById('modal-'+id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+renderPosts();updateStats();
+</script>
+</body>
+</html>
